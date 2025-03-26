@@ -1,11 +1,9 @@
-% Değişkenler, atamalar ve temel aritmetik işlemlerine sahip basit bir hesap makinesi.
+% Değişkenlerin veritabanına kaydedilmesi
+:- dynamic(variable/2). 
 
-% Değişkenlerin ve karşılık gelen değerlerinin veritabanına kaydedilmesi
-:- dynamic(variable/2).  % Değişken-değer çiftlerini saklamak için dinamik predikat kullanımı
-
-% Aritmetik bir ifadeyi değerlendiren fonksiyon.
+% İşlemi değerlendiren fonksiyon.
 evaluate(Expr, Result) :-
-    number(Expr),       % Eğer Expr bir sayı ise, sonucu doğrudan döndür
+    number(Expr),       % Expr sayıysa sayıyı dön
     Result = Expr.
 
 evaluate(Expr, Result) :-
@@ -23,7 +21,7 @@ evaluate(Expr, Result) :-
 perform_operation(+, X, Y, Result) :- Result is X + Y.
 perform_operation(-, X, Y, Result) :- Result is X - Y.
 perform_operation(*, X, Y, Result) :- Result is X * Y.
-perform_operation(/, _, 0, _) :- write('Hata: Sıfıra bölme!'), nl, fail.  % Sıfıra bölme hatası
+perform_operation(/, _, 0, _) :- write('Hata: Sifira Bolunmez.'), nl, fail.  % Sıfıra bölme hatası
 perform_operation(/, X, Y, Result) :- Result is X / Y.
 
 % Bir değişkene değer atama (veritabanına kaydetme).
@@ -44,12 +42,12 @@ parse_and_evaluate(Input) :-
 
 % Kullanıcı ile etkileşimde bulunacak ana döngü.
 calculator :-
-    write('Bir ifade veya atama girin (örneğin, x = 5 veya x + 3): '),
+    write('Bir ifade veya atama girin (mesela, x = 5 veya x + 3): '),
     read_line_to_string(user_input, Input),  % Kullanıcıdan girdi al
     (   Input == "quit"   % Eğer kullanıcı "quit" yazarsa, çık
-    ->  write('Hesap makinesi kapatılıyor...'), nl
+    ->  write('Kapatiliyor...'), nl
     ;   parse_and_evaluate(Input),  % Girdiyi parse et ve değerlendir
         calculator).  % Daha fazla girdi almak için döngüyü devam ettir
 
-% Hesap makinesini başlat.
+% Hesap makinesini başlatır.
 :- calculator.
