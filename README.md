@@ -78,7 +78,15 @@ Sonuc: 8
 
 Prolog:
 
-Bu da diğerleri gibi çalışır.
+variable/2 adlı veritabanı değişkenleri saklar
+variable(var,value) şeklinde veri kaydedilir. var ad, value değerdir
+evaluate fonksiyonu işlemi değerlendirir
+eğer sayı ise sayı, değişken ise değişkenin değeri döner
+işlem ise perform operation fonksiyonu uygulanır
+bu fonksiyon işlemin sonucunu döner, bölen sıfır ise hata basar
+assign fonksiyonu bir değişken adına bir değeri atar ve veritabanına kaydeder
+parse and evaluate girdi atama ise assign ile atamayı yapar, işlem ise evaluate ile işlemi
+
 
 swipl
 ?- prolog_calculator
