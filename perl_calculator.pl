@@ -2,68 +2,49 @@
 use strict;
 use warnings;
 
-# x ve y girdi olarak alınır
-print "x icin deger girin: ";
-my $x = <STDIN>;
-chomp($x);  # Yeni satır karakteri silinir
+# Değişkenleri ve değerlerini saklamak için bir hash
+my %variables;
 
-print "y icin deger girin: ";
-my $y = <STDIN>;
-chomp($y);  # Yeni satır karakteri silinir
+# İfadeleri değerlendirmek için fonksiyon
+sub evaluate_expression {
+    my ($expr) = @_;
+    
+    # Değişkenleri, gerçek değerleriyle değiştirme
+    $expr =~ s/\b([a-zA-Z_][a-zA-Z0-9_]*)\b/$variables{$1} || $1/ge;
 
-# Buradaki kod x ve y'nin sayı olduğunu doğrular. -? herhangi bir negatif veya pozitif değer, \d+(\.\d+) herhangi bir sayı demek
-unless ($x =~ /^-?\d+(\.\d+)?$/ && $y =~ /^-?\d+(\.\d+)?$/) {
-    print "Hata: x and y bu degerleri alamaz.\n";
-    exit;
-}
-
-# x ve y'yi basar
-print "x degeri: $x\n";
-print "y degeri: $y\n";
-
-# İşlem girdi olarak alınır
-print "Islem giriniz (mesela, 2 + x or x * y): ";
-my $input = <STDIN>;
-chomp($input);  # Yeni satır karakteri silinir
-
-# Girdi işlem hesaplanmaya buradan başlanır
-my ($num1, $operator, $num2) = split(/\s+/, $input);  # Boşluklar ile ayrım yapılır
-
-# Sayılar değişken mi değil mi diye bakılır. Eğer x veya y harfi girilmişse o değişkenlerdeki değerler numlara atanır
-if ($num1 eq 'x') {
-    $num1 = $x;  
-} elsif ($num1 eq 'y') {
-    $num1 = $y;  
-}
-
-if ($num2 eq 'x') {
-    $num2 = $x;  
-} elsif ($num2 eq 'y') {
-    $num2 = $y;  
-}
-
-# Ondalık sayılar integere çevrilir
-$num1 = 0 + $num1;  
-$num2 = 0 + $num2;  
-
-# Gelen işleme göre işlemler yapılır
-my $result;
-if ($operator eq '+') {
-    $result = $num1 + $num2;
-} elsif ($operator eq '-') {
-    $result = $num1 - $num2;
-} elsif ($operator eq '*') {
-    $result = $num1 * $num2;
-} elsif ($operator eq '/') {
-    if ($num2 == 0) {
-        print "Hata: Sifira bolunmez.\n";
-        exit;  # Bölüm sıfır ise çıkış yapılır
+    # İşlemi değerlendirme 
+    my $result = eval $expr;
+    if ($@) {
+        print "Islemi degerlendirirken hata olustu: $@\n";
     }
-    $result = $num1 / $num2;
-} else {
-    print "Hata: Desteklenmeyen islem '$operator'.\n";
-    exit;
+    return $result;
 }
 
-# Print the result
-print "Sonuc: $result\n";
+# Bir değişkene değer atama
+sub assign_variable {
+    my ($var, $value) = @_;
+    $variables{$var} = $value;
+}
+
+# Ana döngü, girdiyi almak ve hesaplamaları yapmak için
+while (1) {
+    print "Bir islem girin (örneğin, 2 + x veya x = 5).: ";
+    my $input = <STDIN>;
+    chomp($input);
+
+    # Girdi bir atama içeriyorsa (x = 5), değişkene değer atayın
+    if ($input =~ /^([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*(.*)$/) {
+        my $var = $1;
+        my $value = $2;
+        # Değeri değişkene atama
+        assign_variable($var, evaluate_expression($value));
+        print "$var = $variables{$var}\n";
+    }
+    # Girdi basit bir aritmetik ifade ise, değerlendirin
+    elsif ($input =~ /^(.+)$/) {
+        my $result = evaluate_expression($input);
+        print "Sonuc: $result\n";
+    }
+    print "\n";
+}
+
