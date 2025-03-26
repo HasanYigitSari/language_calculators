@@ -2,28 +2,28 @@ use std::collections::HashMap;
 use std::io;
 
 fn main() {
-    let mut variables = HashMap::new(); // This will store variables and their values.
+    let mut variables = HashMap::new(); // Degiskenleri ve degerleri tutar.
 
     loop {
-        println!("Enter an expression (e.g., x = 5 + 2 or 'exit' to quit):");
+        println!("Girdi: (mesela, 'x = 5 + 2' veya sonra 'y = x + 1' ya da cikmak icin 'cik')");
         
         let mut input = String::new();
-        io::stdin().read_line(&mut input).expect("Failed to read line");
+        io::stdin().read_line(&mut input).expect("Yazilan okunamadi");
         
-        let input = input.trim(); // Remove any extra spaces or newlines.
+        let input = input.trim(); // Bosluklari siler
         
-        if input == "exit" {
-            break; // Exit the loop if the user types "exit".
+        if input == "cik" {
+            break; // "cik" yazilir ise donguden cikar
         }
         
-        // Split input into two parts: before and after the '=' sign
+        // Girdi ikiye ayirilir: '=' den once ve sonrasi
         let parts: Vec<&str> = input.split("=").collect();
         
         if parts.len() == 2 {
-            let var_name = parts[0].trim(); // Get the variable name.
-            let expression = parts[1].trim(); // Get the arithmetic expression.
+            let var_name = parts[0].trim(); // oncesi degisken adini alir.
+            let expression = parts[1].trim(); // sonrasi aritmetik islemi alir.
             
-            // Evaluate the expression.
+            // islem yapilir bu fonksiyon ile
             let result = evaluate_expression(expression, &variables);
             
             match result {
@@ -31,15 +31,15 @@ fn main() {
                     variables.insert(var_name.to_string(), value);
                     println!("{} = {}", var_name, value);
                 }
-                None => println!("Invalid expression!"),
+                None => println!("Kabul edilmeyen islem"),
             }
         } else {
-            println!("Invalid input. Please enter a valid assignment or expression.");
+            println!("Kabul edilmeyen girdi. Lütfen gecerli girdi girin.");
         }
     }
 }
 
-// This function evaluates a simple arithmetic expression like "5 + 2" or "x + 3".
+// "5 + 2" veya "x + 3" gibi basit islemleri yapan fonksiyon
 fn evaluate_expression(expr: &str, variables: &HashMap<String, i32>) -> Option<i32> {
     let tokens: Vec<&str> = expr.split_whitespace().collect();
     
@@ -60,32 +60,33 @@ fn evaluate_expression(expr: &str, variables: &HashMap<String, i32>) -> Option<i
                     if s != 0 {
                         Some(f / s)
                     } else {
-                        println!("Error: Division by zero!");
+                        println!("Hata sifira bolunmez");
                         None
                     }
                 }
                 _ => {
-                    println!("Unknown operator: {}", operator);
+                    println!("Bilinmeyen islem: {}", operator);
                     None
                 }
             },
             _ => None,
         }
-    } else {
+    } else if tokens.len() == 1 {
+        println!("Yanlis islem turu, x = y + z seklinde girin");
         None
     }
 }
 
-// This function parses a value from the expression.
-// If the value is a number, it converts it to an integer.
-// If the value is a variable (like 'x'), it looks it up in the variables map.
+// Bu fonksiyon islemden bir deger okur
+// Eger sayi ise integere cevirir
+// Eger degisken ise map'te bakar
 fn parse_value(value: &str, variables: &HashMap<String, i32>) -> Option<i32> {
     if let Ok(num) = value.parse::<i32>() {
         Some(num)
     } else if let Some(&var_value) = variables.get(value) {
         Some(var_value)
     } else {
-        println!("Error: Invalid value or unknown variable '{}'", value);
+        println!("Gecersiz deger veya bilinmeyen girdi '{}'", value);
         None
     }
 }
